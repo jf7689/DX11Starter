@@ -177,6 +177,42 @@ void Game::CreateBasicGeometry()
 
 	triangle = std::make_shared<Mesh>(vertices, 3, indices, 3, device);
 
+	// Vertex array for rectangle
+	Vertex rectVertices[] =
+	{
+		{ XMFLOAT3(-0.8f, +0.8f, +0.0f), red },   // top left
+		{ XMFLOAT3(-0.6f, +0.8f, +0.0f), blue },  // top right
+		{ XMFLOAT3(-0.6f, +0.6f, +0.0f), green }, // bottom right
+		{ XMFLOAT3(-0.8f, +0.6f, +0.0f), blue },  // bottom left
+	};
+
+	// Index array for pentagon
+	unsigned int rectIndices[] = { 
+		0, 1, 2, 
+		0, 2, 3 
+	};
+	rectangle = std::make_shared<Mesh>(rectVertices, 4, rectIndices, 6, device);
+
+	Vertex pentagonVertices[] =
+	{
+		{ XMFLOAT3( 0.75f, +0.5f, +0.0f), red },  // center
+		{ XMFLOAT3( 0.75f, +0.75f, +0.0f), red },  // top
+		{ XMFLOAT3( 0.9f, +0.55f, +0.0f), green }, // right
+		{ XMFLOAT3( 0.83f, +0.25f, +0.0f), green }, // bottom right
+		{ XMFLOAT3( 0.67f, +0.25f, +0.0f), blue },  // bottom left
+		{ XMFLOAT3( 0.6f, +0.55f, +0.0f), blue },  // left
+	};
+
+	// Index array for pentagon
+	unsigned int pentagonIndices[] = {
+		0, 1, 2,
+		0, 2, 3,
+		0, 3, 4,
+		0, 4, 5,
+		0, 5, 1
+	};
+	pentagon = std::make_shared<Mesh>(pentagonVertices, 6, pentagonIndices, 15, device);
+
 }
 
 
@@ -235,6 +271,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->IASetInputLayout(inputLayout.Get());
 
 	triangle->Draw(context);
+	rectangle->Draw(context);
+	pentagon->Draw(context);
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
