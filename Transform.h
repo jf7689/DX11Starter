@@ -28,4 +28,6 @@ private:
 	// Finalized matrix
 	DirectX::XMFLOAT4X4 worldMatrix;
 
+	// did out matrix need an update?
+	bool matrixDirty;
 };
