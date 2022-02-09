@@ -2,10 +2,10 @@
 
 #include <DirectXMath.h>
 
-class Transfrom
+class Transform
 {
 public:
-	Transfrom();
+	Transform();
 	void MoveAbsolute(float x, float y, float z);
 	void Rotate(float p, float y, float r);
 	void Scale(float x, float y, float z);

@@ -2,7 +2,7 @@
 
 using namespace DirectX;
 
-Transfrom::Transfrom()
+Transform::Transform()
 {
 	// Set up our initial transformation values
 	SetPosition(0, 0, 0);
@@ -16,7 +16,7 @@ Transfrom::Transfrom()
 	matrixDirty = false;
 }
 
-void Transfrom::MoveAbsolute(float x, float y, float z)
+void Transform::MoveAbsolute(float x, float y, float z)
 {
 	/* One way to do this
 	position.x += x;
@@ -33,7 +33,7 @@ void Transfrom::MoveAbsolute(float x, float y, float z)
 	matrixDirty = true;
 }
 
-void Transfrom::Rotate(float p, float y, float r)
+void Transform::Rotate(float p, float y, float r)
 {
 	XMVECTOR pyr = XMLoadFloat3(&pitchYawRoll);
 	XMVECTOR rot = XMVectorSet(p, y, r, 0);
@@ -42,7 +42,7 @@ void Transfrom::Rotate(float p, float y, float r)
 	matrixDirty = true;
 }
 
-void Transfrom::Scale(float x, float y, float z)
+void Transform::Scale(float x, float y, float z)
 {
 	XMVECTOR scl = XMLoadFloat3(&scale);
 	XMVECTOR resize = XMVectorSet(x, y, z, 0);
@@ -51,29 +51,29 @@ void Transfrom::Scale(float x, float y, float z)
 	matrixDirty = true;
 }
 
-void Transfrom::SetPosition(float x, float y, float z)
+void Transform::SetPosition(float x, float y, float z)
 {
 	position = XMFLOAT3(x, y, z);
 	matrixDirty = true;
 }
 
-void Transfrom::SetRotation(float p, float y, float r)
+void Transform::SetRotation(float p, float y, float r)
 {
 	pitchYawRoll = XMFLOAT3(p, y, r);
 	matrixDirty = true;
 }
 
-void Transfrom::SetScale(float x, float y, float z)
+void Transform::SetScale(float x, float y, float z)
 {
 	scale = XMFLOAT3(x, y, z);
 	matrixDirty = true;
 }
 
-DirectX::XMFLOAT3 Transfrom::GetPosition(){ return position; }
-DirectX::XMFLOAT3 Transfrom::GetRotation(){ return pitchYawRoll; }
-DirectX::XMFLOAT3 Transfrom::GetScale(){ return scale; }
+DirectX::XMFLOAT3 Transform::GetPosition(){ return position; }
+DirectX::XMFLOAT3 Transform::GetRotation(){ return pitchYawRoll; }
+DirectX::XMFLOAT3 Transform::GetScale(){ return scale; }
 
-DirectX::XMFLOAT4X4 Transfrom::GetWorldMatrix()
+DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 {
 	// only update if there has been a change 
 	if (matrixDirty)

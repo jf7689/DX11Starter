@@ -230,6 +230,11 @@ void Game::CreateBasicGeometry()
 	};
 	pentagon = std::make_shared<Mesh>(pentagonVertices, 6, pentagonIndices, 15, device);
 
+	gameEntities.push_back(std::make_shared<GameEntity>(triangle));
+	gameEntities.push_back(std::make_shared<GameEntity>(triangle));
+	gameEntities.push_back(std::make_shared<GameEntity>(rectangle));
+	gameEntities.push_back(std::make_shared<GameEntity>(pentagon));
+	gameEntities.push_back(std::make_shared<GameEntity>(pentagon));
 }
 
 
@@ -251,6 +256,23 @@ void Game::Update(float deltaTime, float totalTime)
 	// Example input checking: Quit if the escape key is pressed
 	if (Input::GetInstance().KeyDown(VK_ESCAPE))
 		Quit();
+
+	// transform the meshes
+	float scale = cos(totalTime) * 0.5f + 0.5f;
+	gameEntities[0]->GetTransform()->SetPosition(sin(totalTime), 0, 0);
+	gameEntities[0]->GetTransform()->SetScale(scale, scale, scale);
+	gameEntities[0]->GetTransform()->Rotate(0, 0, deltaTime * 0.2f);
+
+	gameEntities[1]->GetTransform()->SetPosition(cos(totalTime), 0, 0);
+	gameEntities[1]->GetTransform()->SetScale(scale, scale, scale);
+	gameEntities[1]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
+
+	gameEntities[2]->GetTransform()->SetPosition(cos(totalTime)*1.5, 0, 0);
+	gameEntities[2]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
+
+	gameEntities[3]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
+	gameEntities[4]->GetTransform()->SetScale(scale, scale, scale);
+
 }
 
 // --------------------------------------------------------
@@ -287,29 +309,40 @@ void Game::Draw(float deltaTime, float totalTime)
 	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
-	// Fill struct with data
-	VertexShaderExternalData vsData;  
-	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);  
-	vsData.offset = XMFLOAT3(0.25f, 0.0f, 0.0f);
+	// draw all meshes in gameEntities
+	for (int i = 0; i < gameEntities.size(); i++)
+	{
+		// Fill struct with data
+		VertexShaderExternalData vsData;
+		vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
+		vsData.worldMatrix = gameEntities[i]->GetTransform()->GetWorldMatrix();
 
-	// Copying to the resource
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};    
-	context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+		// Copying to the resource
+		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+		context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
 
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+		memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
 
-	context->Unmap(constantBufferVS.Get(), 0);
+		context->Unmap(constantBufferVS.Get(), 0);
 
-	// Bind constant buffer so the vertex shader knows where to look for its variables' data
-	context->VSSetConstantBuffers(
-		0, // Which slot (register) to bind the buffer to?  
-		1, // How many are we activating?  Can do multiple at once  
-		constantBufferVS.GetAddressOf());  // Array of buffers (or the address of one
+		// Bind constant buffer so the vertex shader knows where to look for its variables' data
+		context->VSSetConstantBuffers(
+			0, // Which slot (register) to bind the buffer to?  
+			1, // How many are we activating?  Can do multiple at once  
+			constantBufferVS.GetAddressOf());  // Array of buffers (or the address of one
 
-	triangle->Draw(context);
-	rectangle->Draw(context);
-	pentagon->Draw(context);
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
 
+		context->IASetVertexBuffers(0, 1, gameEntities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(gameEntities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		// Draws meshes
+		context->DrawIndexed(
+			gameEntities[i]->GetMesh()->GetIndexCount(),
+			0,
+			0);
+	}
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
