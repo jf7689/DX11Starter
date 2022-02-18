@@ -11,6 +11,7 @@ Transform::Transform()
 
 	// Create our initial matrix
 	XMStoreFloat4x4(&worldMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&worldInverseTransposeMatrix, XMMatrixIdentity());
 
 	// matrix has yet to change
 	matrixDirty = false;
@@ -75,9 +76,22 @@ DirectX::XMFLOAT3 Transform::GetScale(){ return scale; }
 
 DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 {
+	UpdateMatrices();
+	return worldMatrix;
+}
+
+DirectX::XMFLOAT4X4 Transform::GetWorldInverseTransposeMatrix()
+{
+	UpdateMatrices();
+	return worldInverseTransposeMatrix;
+}
+
+void Transform::UpdateMatrices()
+{
 	// only update if there has been a change 
-	if (matrixDirty)
-	{
+	if (!matrixDirty)
+		return;
+
 		// create the individual transfrom matrices 
 		// for each type of transfrom
 		XMMATRIX transMat = XMMatrixTranslation(position.x, position.y, position.z);
@@ -87,9 +101,8 @@ DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 		// combine them and store the result
 		XMMATRIX worldMat = scaleMat * rotMat * transMat;
 		XMStoreFloat4x4(&worldMatrix, worldMat);
+		XMStoreFloat4x4(&worldInverseTransposeMatrix, XMMatrixInverse(0, XMMatrixTranspose(worldMat)));
 
 		matrixDirty = false;
-	}
 
-	return worldMatrix;
 }

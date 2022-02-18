@@ -18,6 +18,7 @@ public:
 	DirectX::XMFLOAT3 GetRotation();
 	DirectX::XMFLOAT3 GetScale();
 	DirectX::XMFLOAT4X4 GetWorldMatrix();
+	DirectX::XMFLOAT4X4 GetWorldInverseTransposeMatrix();
 
 private:
 	// Raw transformation data
@@ -27,6 +28,9 @@ private:
 
 	// Finalized matrix
 	DirectX::XMFLOAT4X4 worldMatrix;
+	DirectX::XMFLOAT4X4 worldInverseTransposeMatrix;
+
+	void UpdateMatrices();
 
 	// did out matrix need an update?
 	bool matrixDirty;
