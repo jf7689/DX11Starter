@@ -32,6 +32,9 @@ Game::Game(HINSTANCE hInstance)
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
 #endif
+
+	// camera creation
+	camera = std::make_shared<Camera>(0.0f, 0.0f, -5.0f, (float)width / height, XM_PIDIV4, 0.01f, 1000.0f);
 }
 
 // --------------------------------------------------------
@@ -246,6 +249,8 @@ void Game::OnResize()
 {
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
+
+	camera->UpdateProjectionMatrix((float)width / height);
 }
 
 // --------------------------------------------------------
@@ -273,6 +278,7 @@ void Game::Update(float deltaTime, float totalTime)
 	gameEntities[3]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
 	gameEntities[4]->GetTransform()->SetScale(scale, scale, scale);
 
+	camera->Update(deltaTime);
 }
 
 // --------------------------------------------------------
@@ -316,6 +322,8 @@ void Game::Draw(float deltaTime, float totalTime)
 		VertexShaderExternalData vsData;
 		vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
 		vsData.worldMatrix = gameEntities[i]->GetTransform()->GetWorldMatrix();
+		vsData.viewMatrix = camera->GetViewMatrix();
+		vsData.projectionMatrix = camera->GetProjectionMatrix();
 
 		// Copying to the resource
 		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};

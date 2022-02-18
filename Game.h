@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include "GameEntity.h"
+#include "Camera.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
@@ -48,6 +49,8 @@ private:
 
 	// vector containing all the GameEntities
 	std::vector<std::shared_ptr<GameEntity>> gameEntities;
+
+	std::shared_ptr<Camera> camera;
 
 	// Shared ptr for meshes
 	std::shared_ptr<Mesh> triangle;

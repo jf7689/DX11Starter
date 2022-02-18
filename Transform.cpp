@@ -34,6 +34,24 @@ void Transform::MoveAbsolute(float x, float y, float z)
 	matrixDirty = true;
 }
 
+void Transform::MoveRelative(float x, float y, float z)
+{
+	// initial movement vector
+	XMVECTOR moveVec = XMVectorSet(x, y, z, 0);
+
+	// roatate the movement vector by this transform's orientation
+	XMVECTOR rotatedVec = XMVector3Rotate(
+		moveVec, 
+		XMQuaternionRotationRollPitchYaw(pitchYawRoll.x, pitchYawRoll.y, pitchYawRoll.z));
+
+	// add the rotated movement vector to position and overwrite the old position
+	XMVECTOR newPos = XMLoadFloat3(&position) + rotatedVec;
+	XMStoreFloat3(&position, newPos);
+
+	matrixDirty = true;
+
+}
+
 void Transform::Rotate(float p, float y, float r)
 {
 	XMVECTOR pyr = XMLoadFloat3(&pitchYawRoll);
@@ -41,6 +59,7 @@ void Transform::Rotate(float p, float y, float r)
 	XMStoreFloat3(&pitchYawRoll, pyr + rot);
 
 	matrixDirty = true;
+	vectorDirty = true;
 }
 
 void Transform::Scale(float x, float y, float z)
@@ -56,6 +75,7 @@ void Transform::SetPosition(float x, float y, float z)
 {
 	position = XMFLOAT3(x, y, z);
 	matrixDirty = true;
+	vectorDirty = true;
 }
 
 void Transform::SetRotation(float p, float y, float r)
@@ -73,6 +93,24 @@ void Transform::SetScale(float x, float y, float z)
 DirectX::XMFLOAT3 Transform::GetPosition(){ return position; }
 DirectX::XMFLOAT3 Transform::GetRotation(){ return pitchYawRoll; }
 DirectX::XMFLOAT3 Transform::GetScale(){ return scale; }
+
+DirectX::XMFLOAT3 Transform::GetRight()
+{ 
+	UpdateVectors();
+	return right; 
+}
+
+DirectX::XMFLOAT3 Transform::GetUp()
+{ 
+	UpdateVectors();
+	return up; 
+}
+
+DirectX::XMFLOAT3 Transform::GetForward()
+{ 
+	UpdateVectors();
+	return forward;
+}
 
 DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 {
@@ -105,4 +143,20 @@ void Transform::UpdateMatrices()
 
 		matrixDirty = false;
 
+}
+
+void Transform::UpdateVectors()
+{
+	// only update if there has been a change 
+	if (!vectorDirty)
+		return;
+
+	// Update vectors
+	XMVECTOR rotQuat = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&pitchYawRoll));
+	XMStoreFloat3(&right, XMVector3Rotate(XMVectorSet(1, 0, 0, 0), rotQuat));
+	XMStoreFloat3(&up, XMVector3Rotate(XMVectorSet(0, 1, 0, 0), rotQuat));
+	XMStoreFloat3(&forward, XMVector3Rotate(XMVectorSet(0, 0, 1, 0), rotQuat));
+
+	// Vectors are up to date
+	vectorDirty = false;
 }
