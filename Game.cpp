@@ -90,6 +90,8 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
+#pragma region Old Meshes
+	/*
 	// Create some temporary variables to represent colors
 	// - Not necessary, just makes things more readable
 	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -162,18 +164,27 @@ void Game::CreateBasicGeometry()
 	};
 	std::shared_ptr<Mesh> pentagon = std::make_shared<Mesh>(pentagonVertices, 6, pentagonIndices, 15, device, context);
 	meshes.push_back(pentagon);
+	*/
+#pragma endregion
 
 	// Create materials
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), vertexShader, pixelShader));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), vertexShader, pixelShader));
 
-	// Create game entities
+	// Creates mesh from 3D object
+	std::shared_ptr<Mesh> sphere = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
+	meshes.push_back(sphere);
+
+#pragma region Create old game entities
+	// gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
+	// gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
+	// gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[1]));
+	// gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
+	// gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
+#pragma endregion
+
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[1]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
 }
 
 
@@ -198,7 +209,8 @@ void Game::Update(float deltaTime, float totalTime)
 	if (Input::GetInstance().KeyDown(VK_ESCAPE))
 		Quit();
 
-	// transform the meshes
+#pragma region Transform old meshes
+	/*
 	float scale = cos(totalTime) * 0.5f + 0.5f;
 	gameEntities[0]->GetTransform()->SetPosition(sin(totalTime), 0, 0);
 	gameEntities[0]->GetTransform()->SetScale(scale, scale, scale);
@@ -208,11 +220,13 @@ void Game::Update(float deltaTime, float totalTime)
 	gameEntities[1]->GetTransform()->SetScale(scale, scale, scale);
 	gameEntities[1]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
 
-	gameEntities[2]->GetTransform()->SetPosition(cos(totalTime)*1.5f, 0, 0);
+	gameEntities[2]->GetTransform()->SetPosition(cos(totalTime) * 1.5f, 0, 0);
 	gameEntities[2]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
 
 	gameEntities[3]->GetTransform()->Rotate(0, 0, deltaTime * 0.5f);
 	gameEntities[4]->GetTransform()->SetScale(scale, scale, scale);
+	*/
+#pragma endregion
 
 	camera->Update(deltaTime);
 }
@@ -258,14 +272,18 @@ void Game::Draw(float deltaTime, float totalTime)
 		gameEntities[i]->GetMaterial()->GetVertexShader()->SetShader();
 		gameEntities[i]->GetMaterial()->GetPixelShader()->SetShader();
 
-		// Defines the Shader data
+		// Define Vertex data
 		std::shared_ptr<SimpleVertexShader> vs = gameEntities[i]->GetMaterial()->GetVertexShader();
-		vs->SetFloat4("colorTint", gameEntities[i]->GetMaterial()->GetColorTint());
 		vs->SetMatrix4x4("world", gameEntities[i]->GetTransform()->GetWorldMatrix());
 		vs->SetMatrix4x4("view", camera->GetViewMatrix());
 		vs->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 
 		vs->CopyAllBufferData();
+
+		// Define Pixel Shader data
+		std::shared_ptr<SimplePixelShader> ps = gameEntities[i]->GetMaterial()->GetPixelShader();
+		ps->SetFloat4("colorTint", gameEntities[i]->GetMaterial()->GetColorTint());
+		ps->CopyAllBufferData();
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
