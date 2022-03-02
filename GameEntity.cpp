@@ -1,16 +1,26 @@
 #include "GameEntity.h"
 
-GameEntity::GameEntity(std::shared_ptr<Mesh> _mesh)
+GameEntity::GameEntity(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : transform()
 {
-	mesh = _mesh;
+	this->mesh = mesh;
+	this->material = material;
 }
 
-std::shared_ptr<Mesh> GameEntity::GetMesh()
+Transform* GameEntity::GetTransform() { return &transform; }
+std::shared_ptr<Mesh> GameEntity::GetMesh() { return mesh; }
+std::shared_ptr<Material> GameEntity::GetMaterial() { return material; }
+
+void GameEntity::SetTransform(Transform transform)
 {
-	return mesh;
+	this->transform = transform;
 }
 
-Transform* GameEntity::GetTransform()
+void GameEntity::SetMesh(std::shared_ptr<Mesh> mesh)
 {
-	return &transform;
+	this->mesh = mesh;
+}
+
+void GameEntity::SetMaterial(std::shared_ptr<Material> material)
+{
+	this->material = material;
 }
