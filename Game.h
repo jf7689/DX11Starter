@@ -45,6 +45,8 @@ private:
 	// Simple Shaders
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShader;
+	std::shared_ptr<SimplePixelShader> myShader;
+
 
 	// Shared ptr
 	std::vector <std::shared_ptr<Mesh>> meshes;
