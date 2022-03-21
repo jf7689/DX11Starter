@@ -66,6 +66,47 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Sets up the light
+	ambientLight = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	// Directinal Light 1
+	dirLight1 = {};
+	dirLight1.Type = 0;
+	dirLight1.Direction = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	dirLight1.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	dirLight1.Intensity = 0.5f;
+
+	// Directional Light 2
+	dirLight2 = {};
+	dirLight2.Type = 0;
+	dirLight2.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
+	dirLight2.Color = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+	dirLight2.Intensity = 0.5f;
+
+	// Directional Light 3
+	dirLight3 = {};
+	dirLight3.Type = 0;
+	dirLight3.Direction = DirectX::XMFLOAT3(-1.0f, 1.0f, -0.5f);
+	dirLight3.Color = DirectX::XMFLOAT3(0.0, 0.0f, 1.0f);
+	dirLight3.Intensity = 0.5f;
+
+	// Point Light 1
+	pointLight1 = {};
+	pointLight1.Type = 1;
+	pointLight1.Range = 10.0f;
+	pointLight1.Position = DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f);
+	pointLight1.Intensity = 1.0f;
+	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+	// Point Light 2
+	pointLight2 = {};
+	pointLight2.Type = 1;
+	pointLight2.Range = 10.0f;
+	pointLight2.Position = DirectX::XMFLOAT3(4.0f, 1.0f, 0.0f);
+	pointLight2.Intensity = 1.0f;
+	pointLight2.Color = DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f);
+
 }
 
 // --------------------------------------------------------
@@ -169,10 +210,10 @@ void Game::CreateBasicGeometry()
 #pragma endregion
 
 	// Create materials
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), vertexShader, pixelShader));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), vertexShader, pixelShader));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f), vertexShader, myShader));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
 
 
 
@@ -199,7 +240,7 @@ void Game::CreateBasicGeometry()
 
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[3]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[3]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[3]));
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[4], materials[1]));
 }
@@ -298,6 +339,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Define Vertex data
 		std::shared_ptr<SimpleVertexShader> vs = gameEntities[i]->GetMaterial()->GetVertexShader();
 		vs->SetMatrix4x4("world", gameEntities[i]->GetTransform()->GetWorldMatrix());
+		vs->SetMatrix4x4("worldInvTranspose", gameEntities[i]->GetTransform()->GetWorldInverseTransposeMatrix());
 		vs->SetMatrix4x4("view", camera->GetViewMatrix());
 		vs->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 		vs->CopyAllBufferData();
@@ -305,6 +347,15 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Define Pixel Shader data
 		std::shared_ptr<SimplePixelShader> ps = gameEntities[i]->GetMaterial()->GetPixelShader();
 		ps->SetFloat4("colorTint", gameEntities[i]->GetMaterial()->GetColorTint());
+		ps->SetFloat3("cameraPosition", camera->GetTransform()->GetPosition());
+		ps->SetFloat("roughness", gameEntities[i]->GetMaterial()->GetRoughness());
+		ps->SetFloat3("cameraPos", camera->GetTransform()->GetPosition());
+		ps->SetFloat3("ambientLight", ambientLight);
+		ps->SetData("dirLight1", &dirLight1, sizeof(Light));
+		ps->SetData("dirLight2", &dirLight2, sizeof(Light));
+		ps->SetData("dirLight3", &dirLight3, sizeof(Light));
+		ps->SetData("pointLight1", &pointLight1, sizeof(Light));
+		ps->SetData("pointLight2", &pointLight2, sizeof(Light));
 		ps->CopyAllBufferData();
 
 		UINT stride = sizeof(Vertex);

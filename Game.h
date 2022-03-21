@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "SimpleShader.h"
 #include "Material.h"
+#include "Light.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
@@ -53,6 +54,14 @@ private:
 	std::vector<std::shared_ptr<GameEntity>> gameEntities;
 	std::vector < std::shared_ptr<Material> > materials;
 	std::shared_ptr<Camera> camera;
+
+	// Lights
+	DirectX::XMFLOAT3 ambientLight;
+	Light dirLight1;
+	Light dirLight2;
+	Light dirLight3;
+	Light pointLight1;
+	Light pointLight2;
 
 };
 
