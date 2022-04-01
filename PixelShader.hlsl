@@ -7,12 +7,17 @@ cbuffer ExternalData : register(b0)
 	float roughness;
 	float3 cameraPos;
 	float3 ambientLight;
+	float uvScale;
+	float2 uvOffset;
 	Light dirLight1;
 	Light dirLight2;
 	Light dirLight3;
 	Light pointLight1;
 	Light pointLight2;
 }
+
+Texture2D SurfaceTexture	: register(t0);
+SamplerState BasicSampler	: register(s0);
 
 float3 Attenuate(Light light, float3 worldPos)
 {
@@ -42,7 +47,7 @@ float3 CalculateDirectionalLight(Light light, VertexToPixel inputData)
 	}
 
 	// Final color
-	float3 lightColor = (diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular;
+	float3 lightColor = ((diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular) * light.Intensity;
 	return lightColor;
 }
 
@@ -67,7 +72,7 @@ float3 CalculatePointLight(Light light, VertexToPixel inputData)
 	}
 
 	// Final color
-	float3 lightColor = ((diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular) * Attenuate(light, inputData.worldPosition);
+	float3 lightColor = ((diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular) * Attenuate(light, inputData.worldPosition) * light.Intensity;
 	return lightColor;
 }
 
@@ -84,7 +89,16 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	input.normal = normalize(input.normal);
 
-	float3 finalColor = CalculateDirectionalLight(dirLight1, input) + CalculateDirectionalLight(dirLight2, input) + CalculateDirectionalLight(dirLight3, input);
+	// Scale/Offseet the uvs of the texture
+	input.uv = (input.uv + uvOffset) * uvScale;
+
+	// Set texture color
+	float3 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv).rgb;
+
+	// Tint surface color
+	surfaceColor = surfaceColor * colorTint;
+
+	float3 finalColor = surfaceColor + CalculateDirectionalLight(dirLight1, input) + CalculateDirectionalLight(dirLight2, input) + CalculateDirectionalLight(dirLight3, input);
 	finalColor += CalculatePointLight(pointLight1, input) + CalculatePointLight(pointLight2, input);
 
 	return float4(finalColor, 1);

@@ -42,12 +42,10 @@ private:
 	//    Component Object Model, which DirectX objects do
 	//  - More info here: https://github.com/Microsoft/DirectXTK/wiki/ComPtr
 
-
 	// Simple Shaders
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShader;
 	std::shared_ptr<SimplePixelShader> myShader;
-
 
 	// Shared ptr
 	std::vector <std::shared_ptr<Mesh>> meshes;
@@ -62,6 +60,14 @@ private:
 	Light dirLight3;
 	Light pointLight1;
 	Light pointLight2;
+
+	// Textures
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture1;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture2;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture3;
+
+	// Sampler State
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 
 };
 

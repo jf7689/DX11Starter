@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Vertex.h"
 #include "Input.h"
+#include "WICTextureLoader.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
@@ -74,29 +75,29 @@ void Game::Init()
 	dirLight1 = {};
 	dirLight1.Type = 0;
 	dirLight1.Direction = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
-	dirLight1.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
-	dirLight1.Intensity = 0.5f;
+	dirLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	dirLight1.Intensity = 0.1f;
 
 	// Directional Light 2
 	dirLight2 = {};
 	dirLight2.Type = 0;
 	dirLight2.Direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
-	dirLight2.Color = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
-	dirLight2.Intensity = 0.5f;
+	dirLight2.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	dirLight2.Intensity = 0.2f;
 
 	// Directional Light 3
 	dirLight3 = {};
 	dirLight3.Type = 0;
 	dirLight3.Direction = DirectX::XMFLOAT3(-1.0f, 1.0f, -0.5f);
-	dirLight3.Color = DirectX::XMFLOAT3(0.0, 0.0f, 1.0f);
-	dirLight3.Intensity = 0.5f;
+	dirLight3.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	dirLight3.Intensity = 0.15f;
 
 	// Point Light 1
 	pointLight1 = {};
 	pointLight1.Type = 1;
 	pointLight1.Range = 10.0f;
-	pointLight1.Position = DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f);
-	pointLight1.Intensity = 1.0f;
+	pointLight1.Position = DirectX::XMFLOAT3(-3.0f, 0.0f, 0.0f);
+	pointLight1.Intensity = 0.1f;
 	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	// Point Light 2
@@ -104,8 +105,8 @@ void Game::Init()
 	pointLight2.Type = 1;
 	pointLight2.Range = 10.0f;
 	pointLight2.Position = DirectX::XMFLOAT3(4.0f, 1.0f, 0.0f);
-	pointLight2.Intensity = 1.0f;
-	pointLight2.Color = DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f);
+	pointLight2.Intensity = 0.25f;
+	pointLight2.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 }
 
@@ -208,14 +209,43 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(pentagon);
 	*/
 #pragma endregion
+	// Create sampler state
+	D3D11_SAMPLER_DESC ssd = {};
+	ssd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	ssd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	ssd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	ssd.Filter = D3D11_FILTER_ANISOTROPIC;
+	ssd.MaxAnisotropy = 16;
+	ssd.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&ssd, samplerState.GetAddressOf());
+
+	// Load in textures
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/tiledTexture.png").c_str(), nullptr, texture1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/woodTexture.png").c_str(), nullptr, texture2.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/grassTexture.png").c_str(), nullptr, texture3.GetAddressOf());
 
 	// Create materials
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 2.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 15.0f, XMFLOAT2(0.5f, 0.5f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 4.0f, XMFLOAT2(1.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 0.2f, XMFLOAT2(1.0f, 1.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 5.0f, XMFLOAT2(0.25f, 0.25f)));
 
+	// Add textures
+	materials[0]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[0]->AddSampler("BasicSampler", samplerState);
 
+	materials[1]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[1]->AddSampler("BasicSampler", samplerState);
+
+	materials[2]->AddTextureSRV("SurfaceTexture", texture2);
+	materials[2]->AddSampler("BasicSampler", samplerState);
+
+	materials[3]->AddTextureSRV("SurfaceTexture", texture3);
+	materials[3]->AddSampler("BasicSampler", samplerState);
+
+	materials[4]->AddTextureSRV("SurfaceTexture", texture3);
+	materials[4]->AddSampler("BasicSampler", samplerState);
 
 	// Creates meshes from 3D object
 	std::shared_ptr<Mesh> cube = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
@@ -239,10 +269,10 @@ void Game::CreateBasicGeometry()
 #pragma endregion
 
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[3]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[3]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[4], materials[1]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[4]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[3]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[1]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[4], materials[2]));
 }
 
 
@@ -351,11 +381,14 @@ void Game::Draw(float deltaTime, float totalTime)
 		ps->SetFloat("roughness", gameEntities[i]->GetMaterial()->GetRoughness());
 		ps->SetFloat3("cameraPos", camera->GetTransform()->GetPosition());
 		ps->SetFloat3("ambientLight", ambientLight);
+		ps->SetFloat("uvScale", gameEntities[i]->GetMaterial()->GetUvScale());
+		ps->SetFloat2("uvOffset", gameEntities[i]->GetMaterial()->GetUvOffset());
 		ps->SetData("dirLight1", &dirLight1, sizeof(Light));
 		ps->SetData("dirLight2", &dirLight2, sizeof(Light));
 		ps->SetData("dirLight3", &dirLight3, sizeof(Light));
 		ps->SetData("pointLight1", &pointLight1, sizeof(Light));
 		ps->SetData("pointLight2", &pointLight2, sizeof(Light));
+		gameEntities[i]->GetMaterial()->SetMaps();
 		ps->CopyAllBufferData();
 
 		UINT stride = sizeof(Vertex);
