@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "Input.h"
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
@@ -69,7 +70,7 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Sets up the light
-	ambientLight = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	ambientLight = DirectX::XMFLOAT3(0.0f, 0.1f, 0.25f);
 
 	// Directinal Light 1
 	dirLight1 = {};
@@ -124,6 +125,8 @@ void Game::LoadShaders()
 	vertexShader = std::make_shared<SimpleVertexShader>(device, context, GetFullPathTo_Wide(L"VertexShader.cso").c_str());
 	pixelShader = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"PixelShader.cso").c_str());
 	myShader = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"CustomPS.cso").c_str());
+	skyVertexShader = std::make_shared<SimpleVertexShader>(device, context, GetFullPathTo_Wide(L"SkyVertexShader.cso").c_str());
+	skyPixelShader = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"SkyPixelShader.cso").c_str());
 }
 
 
@@ -220,31 +223,41 @@ void Game::CreateBasicGeometry()
 	device->CreateSamplerState(&ssd, samplerState.GetAddressOf());
 
 	// Load in textures
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/tiledTexture.png").c_str(), nullptr, texture1.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/woodTexture.png").c_str(), nullptr, texture2.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/grassTexture.png").c_str(), nullptr, texture3.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone.png").c_str(), nullptr, texture1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, normal1.GetAddressOf());
+
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, texture2.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normal2.GetAddressOf());
+
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock.png").c_str(), nullptr, texture3.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, normal3.GetAddressOf());
 
 	// Create materials
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 4.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 2.0f, XMFLOAT2(0.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 15.0f, XMFLOAT2(0.5f, 0.5f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 4.0f, XMFLOAT2(1.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 0.2f, XMFLOAT2(1.0f, 1.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 5.0f, XMFLOAT2(0.25f, 0.25f)));
 
 	// Add textures
 	materials[0]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[0]->AddTextureSRV("NormalMap", normal1);
 	materials[0]->AddSampler("BasicSampler", samplerState);
 
 	materials[1]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[1]->AddTextureSRV("NormalMap", normal1);
 	materials[1]->AddSampler("BasicSampler", samplerState);
 
 	materials[2]->AddTextureSRV("SurfaceTexture", texture2);
+	materials[2]->AddTextureSRV("NormalMap", normal2);
 	materials[2]->AddSampler("BasicSampler", samplerState);
 
 	materials[3]->AddTextureSRV("SurfaceTexture", texture3);
+	materials[3]->AddTextureSRV("NormalMap", normal3);
 	materials[3]->AddSampler("BasicSampler", samplerState);
 
 	materials[4]->AddTextureSRV("SurfaceTexture", texture3);
+	materials[4]->AddTextureSRV("NormalMap", normal3);
 	materials[4]->AddSampler("BasicSampler", samplerState);
 
 	// Creates meshes from 3D object
@@ -258,6 +271,8 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(sphere);
 	std::shared_ptr<Mesh> torus = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device);
 	meshes.push_back(torus);
+	std::shared_ptr<Mesh> cube2 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
+	meshes.push_back(cube2);
 
 
 #pragma region Create old game entities
@@ -270,9 +285,13 @@ void Game::CreateBasicGeometry()
 
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[4]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[3]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[1]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[1]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[3]));
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[4], materials[2]));
+
+	// Creates the skybox texture
+	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(), nullptr, skyboxTexture.GetAddressOf());
+	skybox = std::make_shared<Sky>(meshes[5], samplerState, device, skyVertexShader, skyPixelShader, skyboxTexture);
 }
 
 
@@ -402,6 +421,9 @@ void Game::Draw(float deltaTime, float totalTime)
 			gameEntities[i]->GetMesh()->GetIndexCount(),
 			0,
 			0);
+
+		// Draw skybox
+		skybox->Draw(context, camera);
 	}
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it

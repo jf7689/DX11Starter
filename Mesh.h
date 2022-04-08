@@ -25,4 +25,6 @@ private:
 	// number of indicies
 	int nIndicies;
 
+	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
+
 };
