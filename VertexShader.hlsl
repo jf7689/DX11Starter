@@ -6,6 +6,8 @@ cbuffer ExternalData : register(b0)
 	matrix worldInvTranspose;
 	matrix view;
 	matrix projection;
+	matrix lightView;
+	matrix lightProj;
 }
 
 // --------------------------------------------------------
@@ -19,6 +21,9 @@ VertexToPixel main( VertexShaderInput input )
 {
 	// Set up output struct
 	VertexToPixel output;
+
+	matrix shadowWVP = mul(lightProj, mul(lightView, world));
+	output.shadowMapPos = mul(shadowWVP, float4(input.localPosition, 1));
 
 	matrix wvp = mul(mul(projection, view), world);
 	output.screenPosition = mul(wvp, float4(input.localPosition, 1.0f));

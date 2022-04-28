@@ -21,7 +21,10 @@ Texture2D AlbedoTexture		: register(t0);
 Texture2D NormalMap			: register(t1);
 Texture2D RoughnessMap		: register(t2);
 Texture2D MetalnessMap		: register(t3);
-SamplerState BasicSampler	: register(s0);
+Texture2D ShadowMap			: register(t4);
+
+SamplerState BasicSampler				: register(s0);
+SamplerComparisonState ShadowSampler	: register(s1);
 
 float3 Attenuate(Light light, float3 worldPos)
 {
@@ -237,7 +240,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 surfaceColor = pow(AlbedoTexture.Sample(BasicSampler, input.uv).rgb, 2.2f);
 
 	// Tint with material surface
-	surfaceColor = surfaceColor * colorTint;
+	//surfaceColor = surfaceColor * colorTint;
 
 	// Unpack normals
 	float3 unpackedNormal = NormalMap.Sample(BasicSampler, input.uv).rgb * 2 - 1;
@@ -258,16 +261,28 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// Sample metalness map
 	float metalness = MetalnessMap.Sample(BasicSampler, input.uv).r;
 
+	// Shadow Mapping
+	// convert from [-1 to 1] to [0 to 1]
+	float2 shadowMapUV = input.shadowMapPos.xy / input.shadowMapPos.w * 0.5f + 0.5f;
+	// flip Y
+	shadowMapUV.y = 1.0f - shadowMapUV.y;
+
+	float depthFromLight = input.shadowMapPos.z / input.shadowMapPos.w;
+
+	float shadowAmount = ShadowMap.SampleCmpLevelZero(ShadowSampler, shadowMapUV, depthFromLight);
+
 	// NonPBR light
 	// float3 finalColor = surfaceColor + CalculateDirectionalLight(dirLight1, input) + CalculateDirectionalLight(dirLight2, input) + CalculateDirectionalLight(dirLight3, input);
 	// finalColor += CalculatePointLight(pointLight1, input) + CalculatePointLight(pointLight2, input);
 
-	float3 finalColor = CalculateDirectionalLight(dirLight1, input, roughness, metalness, surfaceColor) + 
+	float3 finalColor = CalculateDirectionalLight(dirLight1, input, roughness, metalness, surfaceColor) * shadowAmount; 
+	/* Not used for final project +
 		CalculateDirectionalLight(dirLight2, input, roughness, metalness, surfaceColor) +
 		CalculateDirectionalLight(dirLight3, input, roughness, metalness, surfaceColor);
 
 	finalColor = finalColor + CalculatePointLight(pointLight1, input, roughness, metalness, surfaceColor) + 
 		CalculatePointLight(pointLight2, input, roughness, metalness, surfaceColor);
+	*/
 
 	return float4(pow(finalColor, 1.0f / 2.2f), 1);
 }
