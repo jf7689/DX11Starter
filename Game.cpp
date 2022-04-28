@@ -77,7 +77,7 @@ void Game::Init()
 	dirLight1.Type = 0;
 	dirLight1.Direction = DirectX::XMFLOAT3(0.0f, -0.5f, -0.2f);
 	dirLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	dirLight1.Intensity = 0.5f;
+	dirLight1.Intensity = 1.0f;
 
 	/* Not used for final project
 	// Directional Light 2
@@ -240,21 +240,25 @@ void Game::CreateBasicGeometry()
 	*/
 
 	// Load in PBR textures
-	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_albedo.png").c_str(), nullptr, albedo1.GetAddressOf());
-	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_normals.png").c_str(), nullptr, normals1.GetAddressOf());
-	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_roughness.png").c_str(), nullptr, roughness1.GetAddressOf());
-	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_metalness.png").c_str(), nullptr, metalness1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_albedo.png").c_str(), nullptr, albedo1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_normals.png").c_str(), nullptr, normals1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_roughness.png").c_str(), nullptr, roughness1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/ground_metal.png").c_str(), nullptr, metalness1.GetAddressOf());
 
-	// not used for final project
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_albedo.png").c_str(), nullptr, albedo1.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_normals.png").c_str(), nullptr, normals1.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_roughness.png").c_str(), nullptr, roughness1.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_metal.png").c_str(), nullptr, metalness1.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/rock_albedo.png").c_str(), nullptr, albedo2.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/rock_normals.png").c_str(), nullptr, normals2.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/rock_roughness.png").c_str(), nullptr, roughness2.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/rock_metal.png").c_str(), nullptr, metalness2.GetAddressOf());
 
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_albedo.png").c_str(), nullptr, albedo2.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_normals.png").c_str(), nullptr, normals2.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_roughness.png").c_str(), nullptr, roughness2.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_metal.png").c_str(), nullptr, metalness2.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_albedo.png").c_str(), nullptr, albedo2.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_normals.png").c_str(), nullptr, normals2.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_roughness.png").c_str(), nullptr, roughness2.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/bronze_metal.png").c_str(), nullptr, metalness2.GetAddressOf());
+
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_albedo.png").c_str(), nullptr, albedo2.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_normals.png").c_str(), nullptr, normals2.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_roughness.png").c_str(), nullptr, roughness2.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/cobblestone_metal.png").c_str(), nullptr, metalness2.GetAddressOf());
 
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/floor_albedo.png").c_str(), nullptr, albedo3.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/floor_normals.png").c_str(), nullptr, normals3.GetAddressOf());
@@ -275,15 +279,15 @@ void Game::CreateBasicGeometry()
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/scratched_normals.png").c_str(), nullptr, normals6.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/scratched_roughness.png").c_str(), nullptr, roughness6.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/PBR/scratched_metal.png").c_str(), nullptr, metalness6.GetAddressOf());
-	//*/
+
 
 	// Create materials
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 4.0f, XMFLOAT2(0.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.0f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 2.0f, XMFLOAT2(0.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.0f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.15f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
 
 #pragma region Add textures
 		/*
@@ -349,18 +353,17 @@ void Game::CreateBasicGeometry()
 	// Creates meshes from 3D object
 	std::shared_ptr<Mesh> cube = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
 	meshes.push_back(cube);
-	//Not used for final projecy
-	std::shared_ptr<Mesh> cylinder = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/cylinder.obj").c_str(), device);
-	meshes.push_back(cylinder);
-	std::shared_ptr<Mesh> helix = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/helix.obj").c_str(), device);
-	meshes.push_back(helix);
 	std::shared_ptr<Mesh> sphere = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	meshes.push_back(sphere);
-	std::shared_ptr<Mesh> torus = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device);
-	meshes.push_back(torus);
 	std::shared_ptr<Mesh> sphere2 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	meshes.push_back(sphere2);
-	//*/
+	std::shared_ptr<Mesh> sphere3 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
+	meshes.push_back(sphere3);
+	std::shared_ptr<Mesh> sphere4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
+	meshes.push_back(sphere4);
+	std::shared_ptr<Mesh> sphere5 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
+	meshes.push_back(sphere5);
+	
 
 
 #pragma region Create old game entities
@@ -371,11 +374,11 @@ void Game::CreateBasicGeometry()
 	// gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[2]));
 #pragma endregion
 
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[1]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[3]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[4]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[0]));
-	gameEntities.push_back(std::make_shared<GameEntity>(meshes[4], materials[2]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[0], materials[0]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[1], materials[1]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[2], materials[3]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[3], materials[5]));
+	gameEntities.push_back(std::make_shared<GameEntity>(meshes[4], materials[3]));
 	gameEntities.push_back(std::make_shared<GameEntity>(meshes[5], materials[5]));
 
 	// Creates the skybox texture
@@ -542,11 +545,11 @@ void Game::Update(float deltaTime, float totalTime)
 
 	gameEntities[0]->GetTransform()->SetPosition(0.0f, -17.0f, 0.0f);
 	gameEntities[0]->GetTransform()->SetScale(15.0f, 15.0f, 15.0f);
-	gameEntities[1]->GetTransform()->SetPosition(-6.0f, 0.0f, 0.0f);
-	gameEntities[2]->GetTransform()->SetPosition(-2.0f, 0.0f, 0.0f);
-	gameEntities[3]->GetTransform()->SetPosition(2.0f, 0.0f, 0.0f);
-	gameEntities[4]->GetTransform()->SetPosition(6.0f, 0.0f, 0.0f);
-	gameEntities[5]->GetTransform()->SetPosition(10.0f, 0.0f, 0.0f);
+	gameEntities[1]->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
+	gameEntities[2]->GetTransform()->SetPosition(2.0f, 0.0f, 5.0f);
+	gameEntities[3]->GetTransform()->SetPosition(4.0f, 0.0f, 0.0f);
+	gameEntities[4]->GetTransform()->SetPosition(6.0f, 0.0f, 5.0f);
+	gameEntities[5]->GetTransform()->SetPosition(8.0f, 0.0f, 0.0f);
 
 	camera->Update(deltaTime);
 }

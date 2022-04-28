@@ -240,7 +240,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 surfaceColor = pow(AlbedoTexture.Sample(BasicSampler, input.uv).rgb, 2.2f);
 
 	// Tint with material surface
-	//surfaceColor = surfaceColor * colorTint;
+	surfaceColor = surfaceColor * colorTint;
 
 	// Unpack normals
 	float3 unpackedNormal = NormalMap.Sample(BasicSampler, input.uv).rgb * 2 - 1;
